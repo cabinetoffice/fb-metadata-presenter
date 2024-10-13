@@ -83,6 +83,10 @@ module MetadataPresenter
       value.join('<br>').html_safe
     end
 
+    def dropdown2(value)
+      value.join('<br>').html_safe
+    end
+    
     def upload(file_hash)
       file_hash['original_filename']
     end
