@@ -113,6 +113,7 @@ module MetadataPresenter
     end
 
     def autocomplete_component_present?
+      # byebug
       components.any?(&:autocomplete?)
     end
 

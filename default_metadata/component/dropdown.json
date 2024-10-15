@@ -2,30 +2,53 @@
   "_id": "component.dropdown",
   "_type": "dropdown",
   "errors": {},
-  "label": "Dropdown question",
+  "label": "Dropdown question 123",
   "hint": "Select an option from the list",
   "name": "component-name-dropdown",
   "validation": {
-    "required": true
+    "required": false
   },
-  "options": [
+  "items": [
     {
-      "id": "option1",
-      "name": "Option 1"
+      "_id": "myid1",
+      "_type": "checkbox",
+      "label": "Sales",
+      "hint": "",
+      "value": "Sales",
+      "name": "Op1"
     },
     {
-      "id": "option2",
-      "name": "Option 2"
+      "_id": "myid2",
+      "_type": "checkbox",
+      "label": "Marketing",
+      "hint": "",
+      "value": "Marketing",
+      "name": "Op2"
     },
     {
-      "id": "option3",
-      "name": "Option 3"
+      "_id": "myid3",
+      "_type": "checkbox",
+      "label": "Finance",
+      "hint": "",
+      "value": "Finance",
+      "name": "Op3"
     },
     {
-      "id": "option4",
-      "name": "Option 4"
+      "_id": "myid4",
+      "label": "Purchase",
+      "hint": "",
+      "value": "Purchase",
+      "name": "Op4"
+    },
+    {
+      "_id": "myid4",
+      "label": "Reseach",
+      "hint": "",
+      "value": "Purchase",
+      "name": "Op4"
     }
   ],
   "include_blank": true,
-  "default": "option2"
+  "default": "option2",
+  "legend": "Question"
 }

@@ -16,6 +16,11 @@ module MetadataPresenter
   
       def initialize(selected)
         @selected_option = sanitize_option(selected)
+        @departments = [
+          OpenStruct.new(id: 1, name: 'Sales'),
+          OpenStruct.new(id: 2, name: 'Marketing'),
+          OpenStruct.new(id: 3, name: 'Finance')
+        ]
       end
   
       # A method to ensure the selected option is valid (exists in OPTIONS)

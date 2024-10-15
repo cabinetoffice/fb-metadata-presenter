@@ -20,12 +20,5 @@
       "$ref": "validations#/definitions/errors_address"
     }
   ],
-  "composite": [
-    "address_line_one",
-    "address_line_two",
-    "city",
-    "county",
-    "postcode",
-    "country"
-  ]
+  "composite": ["address_line_two", "city", "county", "postcode", "country"]
 }

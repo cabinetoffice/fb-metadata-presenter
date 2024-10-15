@@ -5,6 +5,7 @@ class MetadataPresenter::Metadata
   attr_reader :metadata
 
   def initialize(metadata, editor: false)
+    puts("=============>> metadata #{metadata}")
     @metadata = OpenStruct.new(metadata)
     @editor = editor
   end
