@@ -4,7 +4,14 @@ module MetadataPresenter
       include ActiveModel::Validations
       include ActionView::Helpers
   
-      attr_reader :selected_option
+      FIELDS = %w[
+        one
+        two
+      ].freeze
+  
+      attr_reader(*FIELDS)
+      
+      # attr_reader :selected_option
   
       # Constants for options could be defined here if they are static
       OPTIONS = %w[

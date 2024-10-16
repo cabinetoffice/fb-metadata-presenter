@@ -1,8 +1,7 @@
-<%= debug component %>
 
 <%=
   f.govuk_collection_check_boxes component.id.to_sym,
-    component.items,
+  component.items,
     :id,
     :name,
     :description,
@@ -13,3 +12,4 @@
     },
     include_hidden: false
 %>
+
