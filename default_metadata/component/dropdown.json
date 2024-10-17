@@ -20,7 +20,7 @@
     }
   ],
   "name": "component-name",
-  "legend": "Question",
+  "label": "Question",
   "validation": {
     "required": true
   }
