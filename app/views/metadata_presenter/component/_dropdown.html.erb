@@ -1,13 +1,54 @@
+<%
+heading = 'MyList'
 
-<%= f.govuk_collection_select :heading,
-component.items, 
-  :id, 
-  :name,
-  label: { text: input_title },
-  hint: {
-      data: { "fb-default-text" => default_text('hint') },
-      text: component.hint
-  },
-  include_hidden: false
+departments = [
+  OpenStruct.new(id: 1, name: 'Sales'),
+  OpenStruct.new(id: 2, name: 'Marketing'),
+  OpenStruct.new(id: 3, name: 'Finance')
+]
+%>
+<%=
+ render(ExampleComponent.new(text: "Important message"))
 %>
 
+
+<%= custom_govuk_summary_list(rows: [
+  { type: "Grants", category: "Internal staff", instances: "4", value: "£97,581.95", comments: "Duplicate payment made that was not declared by supplier at the time and was only picked up later", actions: link_to("Update", "services/4940cc85-d5e4-4889-b48f-3e601b3cde4d/pages/a7e618e3-a3e5-4c6f-987b-da6ba7b2bea7/edit" )  },
+  { type: "Email", category: "Company(customer)" },
+  { type: "Phone", category: "Contractor(supplier)", instances: "3",value: "£11,300.00",comments:"Salary overpayments", actions: link_to("Change", "services/4940cc85-d5e4-4889-b48f-3e601b3cde4d/pages/a7e618e3-a3e5-4c6f-987b-da6ba7b2bea7/edit" ) }
+],style: 'width:200%;') %>
+
+
+
+<%= govuk_summary_list do |summary_list|
+summary_list.with_row do |row|
+row.with_key { 'Aardvark' }
+row.with_value { 'The aardvark is vaguely pig-like in appearance' }
+row.with_action(text: "Change", href: '#', visually_hidden_text: 'aardvarks')
+
+end; summary_list.with_row do |row|
+row.with_key(text: 'Baboon')
+row.with_value(text: 'Monkeys of the genus Papio')
+row.with_action(text: "Email", href: '#', visually_hidden_text: 'baboons')
+row.with_action(text: "Change", href: '#', visually_hidden_text: 'baboons')
+
+end; summary_list.with_row do |row|
+row.with_key(text: 'Chinchilla')
+row.with_value(text: 'Either of two species of crepuscular rodents')
+row.with_action(text: 'Change', visually_hidden_text: 'chinchillas', href: '#')
+
+end; summary_list.with_row do |row|
+row.with_key(text: 'Dugong')
+row.with_value(text: 'Dugongs are a species of sea cow')
+end; end %>
+
+
+<%= f.govuk_fieldset legend: { text: input_title }, described_by: component.id do%>
+<%= f.govuk_collection_select 'Please Select',
+User.all, 
+  :id, 
+  :name,
+include_hidden: false
+%>
+
+<% end %>

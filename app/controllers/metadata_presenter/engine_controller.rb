@@ -226,5 +226,20 @@ module MetadataPresenter
       service.service_name || 'MoJ Forms'
     end
     helper_method :form_page_title
+
+    def custom_govuk_summary_list(rows:, custom_class: nil)
+      content_tag(:dl, class: "govuk-summary-list #{custom_class}") do
+        rows.each do |row|
+          concat(content_tag(:div, class: "govuk-summary-list__row") do
+            concat(content_tag(:dt, row[:key][:text], class: "govuk-summary-list__key"))
+            concat(content_tag(:dd, row[:value][:text], class: "govuk-summary-list__value"))
+          end)
+        end
+      end
+    end
+    helper_method :custom_govuk_summary_list
+
+
+
   end
 end
