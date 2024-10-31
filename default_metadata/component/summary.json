@@ -1,0 +1,11 @@
+{
+  "_id": "component.summary",
+  "_type": "summary",
+  "errors": {},
+  "label": "Question",
+  "hint": "",
+  "name": "component-name",
+  "validation": {
+    "required": true
+  }
+}

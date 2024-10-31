@@ -6,6 +6,7 @@ module MetadataPresenter
       page.confirmation
       page.content
       page.repeatablepage
+      page.summarypage
       page.start
     ].freeze
 

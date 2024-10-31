@@ -1,0 +1,28 @@
+{
+  "$id": "http://gov.uk/schema/v1.0.0/page/content",
+  "_name": "page.summarypage",
+  "title": "Content",
+  "description": "Display content to users without asking any questions",
+  "type": "object",
+  "properties": {
+    "_type": {
+      "const": "page.summarypage"
+    },
+    "components": {
+      "title": "Components",
+      "description": "The form or content elements used on the page",
+      "type": "array",
+      "items": {
+        "$ref": "component.summary"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "definition.page.content"
+    }
+  ],
+  "uiCategory": {
+    "main": ["lede", "body"]
+  }
+}

@@ -16,6 +16,7 @@ module MetadataPresenter
     USES_HEADING = %w[
       page.content
       page.repeatablepage
+      page.summarypage
       page.checkanswers
       page.confirmation
       page.multiplequestions

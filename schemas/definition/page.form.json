@@ -10,39 +10,29 @@
       "items": {
         "$ref": "definition.component"
       },
-      "accepts": [
-        "content"
-      ],
-      "category": [
-        "additional"
-      ]
+      "accepts": ["content"],
+      "category": ["additional"]
     },
     "section_heading": {
       "title": "Section heading",
       "description": "Name of section",
       "type": "string",
       "content": true,
-      "category": [
-        "content"
-      ]
+      "category": ["content"]
     },
     "section_heading_summary": {
       "title": "Section heading (Summary version)",
       "description": "A condensed version of the section heading, for use on the 'check your answers' page",
       "type": "string",
       "content": true,
-      "category": [
-        "content"
-      ]
+      "category": ["content"]
     },
     "heading_summary": {
       "title": "Heading (Summary version)",
       "description": "A condensed version of the page heading, for use on the 'check your answers' page",
       "type": "string",
       "content": true,
-      "category": [
-        "content"
-      ]
+      "category": ["content"]
     },
     "nextPage": {
       "$ref": "definition.next_page"
@@ -54,9 +44,10 @@
     },
     {
       "$ref": "definition.repeatable"
+    },
+    {
+      "$ref": "definition.summary"
     }
   ],
-  "category": [
-    "form_page"
-  ]
+  "category": ["form_page"]
 }

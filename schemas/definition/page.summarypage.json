@@ -1,0 +1,17 @@
+{
+  "$id": "http://gov.uk/schema/v1.0.0/definition/page/summarypage",
+  "_name": "definition.page.summarypage",
+  "title": "Content page definition",
+  "properties": {
+    "components": {
+      "accepts": ["content"]
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "definition.page"
+    }
+  ],
+  "required": ["heading"],
+  "category": ["contentPage"]
+}
