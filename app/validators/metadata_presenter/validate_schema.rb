@@ -4,6 +4,7 @@ end
 class MetadataPresenter::ValidateSchema
   class << self
     def before(controller)
+      puts "11111111111111"
       return unless controller.request.post?
 
       validate(controller.request.params, 'request.service')
@@ -19,6 +20,10 @@ class MetadataPresenter::ValidateSchema
     end
 
     def validate(metadata, schema_name)
+      puts 'Arul :::'
+      puts schema_name
+      puts 'Arul :::'
+
       schema = JSON::Validator.schema_for_uri(schema_name)&.schema || find(schema_name)
       JSON::Validator.validate!(schema, metadata)
     end
