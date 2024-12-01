@@ -1,14 +1,26 @@
-<%= debug component %>
-<%=
-  f.govuk_text_area component.id.to_sym,
-    label: { text: input_title },
-    hint: {
-      data: { "fb-default-text" => default_text('hint'), "fb-node" => "hint" },
-      text: component.hint
-    },
-    name: "answers[#{component.name}]",
-    max_chars: component.validation['max_length'],
-    max_words: component.validation['max_word'],
-    threshold: component.validation_threshold,
-    rows: component.rows
+
+
+
+  <%
+table_data = {
+  head: ["Type","Category","Instances","Value","Comments","Action","   "],
+  rows: [
+    ["Grants", "Internal staff | Abuse of position | Payment fraud",4, 97581.95, "Duplicate payment made that was not declared by supplier at the time and was only picked up later",link_to("Update", "/edit"), link_to("DELETE", "/delete")],
+    ["Income", "Company(customer)| Failure to declare/disclose | Charge evasion", 3, 20254.77, "Three instances of fraudulent use of GPC", link_to("Update", "/edit"), link_to("DELETE", "/delete") ],
+    ["Income", "Contractor (supplier) | Misrepresentation | Mandate fraud", 3, 11300.00, "Salary overpayments passed to debt recovery as staff not responded to multiple requests for repayment - on balance considered to be fraud (failure to disclose)", link_to("Update", "/edit"), link_to("DELETE", "/delete") ],
+    ["Loans", "Charity (customer) | Abuse of position | Asset misappropriation", 2, 0.00, "Theft of assets by unknown 3rd parties", link_to("Update", "/edit"), link_to("DELETE", "/delete") ],
+    ["Subsidies", "Sole trader (supplier) | Abuse of position | Contract rigging", 1, 2396.31, "Staff member claimed to have qualifications to obtain apprenticeship role that they did not have and were dismissed", link_to("Update", "/edit"), link_to("DELETE", "/delete") ],
+    ["Personnel", "Internal staff | Misrepresentation | Falsified application", 1, 11538.42, "Staff member dismissed for operating personal business during EA working hours. Unable to ascertain value of loss.", link_to("Update", "/edit"), link_to("DELETE", "/delete") ]
+  ],
+  foot: [  "Total","","",        143071.45,"","",""]
+}
 %>
+
+<%= f.govuk_fieldset legend: { text: input_title }, described_by: component.id do%>
+  <%= govuk_table(
+    caption: "Detected fraud",
+    head: table_data[:head],
+    rows: table_data[:rows],
+    foot: table_data[:foot],
+  ) %>
+<% end %>
