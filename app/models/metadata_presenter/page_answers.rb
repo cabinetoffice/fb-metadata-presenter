@@ -34,6 +34,8 @@ module MetadataPresenter
         answer_object.to_h if answer_object.present?
       elsif component && component.type == 'checkboxes'
         answers[method_name.to_s].to_a
+      elsif component && component.type == 'matrix'
+        matrix_answer(component)
       elsif component && component.type == 'address'
         address_answer(method_name.to_s)
       else
@@ -135,6 +137,32 @@ module MetadataPresenter
       MetadataPresenter::DateField.new(day: date[0], month: date[1], year: date[2])
     end
 
+    def matrix_answer(component)
+      raw_answer = hash_value(answers[component.id.to_s])
+      mode = component.mode.presence || 'selection'
+
+      rows = Array(component.rows)
+      columns = Array(component.columns)
+
+      if mode == 'numeric'
+        rows.each_with_object({}) do |row, normalized|
+          row_id = row['id'].to_s
+          row_answer = hash_value(raw_answer[row_id])
+
+          normalized[row_id] = columns.each_with_object({}) do |column, row_normalized|
+            column_id = column['id'].to_s
+            row_normalized[column_id] = numeric_matrix_value(row_answer[column_id])
+          end
+        end
+      else
+        rows.each_with_object({}) do |row, normalized|
+          row_id = row['id'].to_s
+          value = raw_answer[row_id]
+          normalized[row_id] = value.blank? ? nil : sanitize(value)
+        end
+      end
+    end
+
     def raw_date_answer(component_id)
       [
         GOVUKDesignSystemFormBuilder::Elements::Date::SEGMENTS[:day],
@@ -176,6 +204,22 @@ module MetadataPresenter
       file_extension = '.jpeg' if %w[.jpg .jpe .jif .jfif].include?(file_extension)
 
       [file_basename, file_extension].join
+    end
+
+    def hash_value(value)
+      return {} if value.blank?
+      return value.to_h if value.respond_to?(:to_h)
+
+      {}
+    end
+
+    def numeric_matrix_value(value)
+      return nil if value.blank?
+
+      parsed = Float(value, exception: false)
+      return parsed unless parsed.nil?
+
+      sanitize(value)
     end
 
     # NOTE: Address component is different to other components in the sense it can

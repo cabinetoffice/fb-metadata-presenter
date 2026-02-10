@@ -138,6 +138,82 @@ RSpec.describe MetadataPresenter::PageAnswersPresenter do
       end
     end
 
+    context 'when component is matrix in selection mode' do
+      let(:page) do
+        MetadataPresenter::Page.new(
+          {
+            '_id' => 'page.matrix',
+            '_type' => 'page.singlequestion',
+            '_uuid' => 'page-uuid',
+            'url' => '/matrix',
+            'components' => [
+              {
+                '_id' => 'matrix_1',
+                '_type' => 'matrix',
+                '_uuid' => 'matrix-uuid',
+                'legend' => 'Matrix question',
+                'hint' => '',
+                'name' => 'matrix_1',
+                'mode' => 'selection',
+                'rows' => [{ 'id' => 'row-1', 'label' => 'Row 1' }],
+                'columns' => [
+                  { 'id' => 'column-1', 'label' => 'Yes' },
+                  { 'id' => 'column-2', 'label' => 'No' }
+                ],
+                'validation' => { 'required' => true }
+              }
+            ]
+          }
+        )
+      end
+      let(:component) { page.components.first }
+      let(:answers) { { component.id => { 'row-1' => 'column-2' } } }
+
+      it 'returns row to selected column label mapping' do
+        expect(presenter.answer).to eq('Row 1: No')
+      end
+    end
+
+    context 'when component is matrix in numeric mode' do
+      let(:page) do
+        MetadataPresenter::Page.new(
+          {
+            '_id' => 'page.matrix-numeric',
+            '_type' => 'page.singlequestion',
+            '_uuid' => 'page-uuid-numeric',
+            'url' => '/matrix-numeric',
+            'components' => [
+              {
+                '_id' => 'matrix_numeric_1',
+                '_type' => 'matrix',
+                '_uuid' => 'matrix-numeric-uuid',
+                'legend' => 'Matrix numeric question',
+                'hint' => '',
+                'name' => 'matrix_numeric_1',
+                'mode' => 'numeric',
+                'rows' => [{ 'id' => 'row-1', 'label' => 'Row 1' }],
+                'columns' => [
+                  { 'id' => 'column-1', 'label' => 'A' },
+                  { 'id' => 'column-2', 'label' => 'B' }
+                ],
+                'validation' => { 'required' => true }
+              }
+            ]
+          }
+        )
+      end
+      let(:component) { page.components.first }
+      let(:answers) do
+        { component.id => { 'row-1' => { 'column-1' => '10.5', 'column-2' => '' } } }
+      end
+
+      it 'returns a table rendering for matrix numeric answers' do
+        expect(presenter.answer).to include('<table')
+        expect(presenter.answer).to include('Row 1')
+        expect(presenter.answer).to include('10.5')
+      end
+    end
+
     context 'when there is no answer' do
       let(:page) { service.find_page_by_url('/name') }
       let(:answers) { {} }

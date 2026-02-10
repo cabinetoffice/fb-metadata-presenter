@@ -1,0 +1,62 @@
+{
+  "$id": "http://gov.uk/schema/v1.0.0/matrix",
+  "_name": "component.matrix",
+  "title": "Matrix",
+  "description": "Let users answer using a row/column matrix",
+  "type": "object",
+  "properties": {
+    "_type": {
+      "const": "matrix"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "selection",
+        "numeric"
+      ]
+    },
+    "selection_rule": {
+      "type": "string",
+      "enum": [
+        "single_per_row"
+      ]
+    },
+    "row_heading": {
+      "type": "string"
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "definition.matrix_row"
+      }
+    },
+    "columns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "definition.matrix_column"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "definition.fieldset"
+    },
+    {
+      "$ref": "definition.name"
+    },
+    {
+      "$ref": "validations#/definitions/required_bundle"
+    },
+    {
+      "$ref": "validations#/definitions/number_bundle"
+    }
+  ],
+  "required": [
+    "name",
+    "mode",
+    "rows",
+    "columns"
+  ]
+}

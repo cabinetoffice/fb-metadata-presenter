@@ -4,6 +4,7 @@ class MetadataPresenter::Component < MetadataPresenter::Metadata
   VALIDATION_BUNDLES = {
     'date' => 'date',
     'number' => 'number',
+    'matrix' => 'number',
     'text' => 'string',
     'textarea' => 'string',
     'multiupload' => 'file'
@@ -69,6 +70,10 @@ class MetadataPresenter::Component < MetadataPresenter::Metadata
 
   def multiupload?
     type == 'multiupload'
+  end
+
+  def matrix?
+    type == 'matrix'
   end
 
   def find_item_by_uuid(uuid)

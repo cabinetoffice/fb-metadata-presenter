@@ -126,6 +126,102 @@ RSpec.describe MetadataPresenter::RequiredValidator do
         end
       end
 
+      context 'when component is a matrix in selection mode' do
+        let(:page) do
+          MetadataPresenter::Page.new(
+            {
+              '_id' => 'page.matrix',
+              '_type' => 'page.singlequestion',
+              '_uuid' => 'page-uuid',
+              'url' => '/matrix',
+              'components' => [
+                {
+                  '_id' => 'matrix_1',
+                  '_type' => 'matrix',
+                  '_uuid' => 'matrix-uuid',
+                  'legend' => 'Matrix question',
+                  'hint' => '',
+                  'name' => 'matrix_1',
+                  'mode' => 'selection',
+                  'rows' => [{ 'id' => 'row-1', 'label' => 'Row 1' }],
+                  'columns' => [
+                    { 'id' => 'column-1', 'label' => 'Yes' },
+                    { 'id' => 'column-2', 'label' => 'No' }
+                  ],
+                  'validation' => { 'required' => true }
+                }
+              ]
+            }
+          )
+        end
+
+        context 'when a row has no selected column' do
+          let(:answers) { { 'matrix_1' => { 'row-1' => '' } } }
+
+          it 'returns invalid' do
+            expect(validator).to_not be_valid
+          end
+        end
+
+        context 'when all rows have a selected column' do
+          let(:answers) { { 'matrix_1' => { 'row-1' => 'column-1' } } }
+
+          it 'returns valid' do
+            expect(validator).to be_valid
+          end
+        end
+      end
+
+      context 'when component is a matrix in numeric mode' do
+        let(:page) do
+          MetadataPresenter::Page.new(
+            {
+              '_id' => 'page.matrix-numeric',
+              '_type' => 'page.singlequestion',
+              '_uuid' => 'page-uuid-numeric',
+              'url' => '/matrix-numeric',
+              'components' => [
+                {
+                  '_id' => 'matrix_numeric_1',
+                  '_type' => 'matrix',
+                  '_uuid' => 'matrix-numeric-uuid',
+                  'legend' => 'Matrix numeric question',
+                  'hint' => '',
+                  'name' => 'matrix_numeric_1',
+                  'mode' => 'numeric',
+                  'rows' => [{ 'id' => 'row-1', 'label' => 'Row 1' }],
+                  'columns' => [
+                    { 'id' => 'column-1', 'label' => 'A' },
+                    { 'id' => 'column-2', 'label' => 'B' }
+                  ],
+                  'validation' => { 'required' => true }
+                }
+              ]
+            }
+          )
+        end
+
+        context 'when all cells in a row are blank' do
+          let(:answers) do
+            { 'matrix_numeric_1' => { 'row-1' => { 'column-1' => '', 'column-2' => '' } } }
+          end
+
+          it 'returns invalid' do
+            expect(validator).to_not be_valid
+          end
+        end
+
+        context 'when at least one cell in each row has a value' do
+          let(:answers) do
+            { 'matrix_numeric_1' => { 'row-1' => { 'column-1' => '10', 'column-2' => '' } } }
+          end
+
+          it 'returns valid' do
+            expect(validator).to be_valid
+          end
+        end
+      end
+
       context 'when date field' do
         let(:page) { service.find_page_by_url('/holiday') }
         let(:answers) do

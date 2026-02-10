@@ -235,6 +235,69 @@ RSpec.describe MetadataPresenter::PageAnswers do
       end
     end
 
+    context 'when the component is a matrix' do
+      let(:page) do
+        MetadataPresenter::Page.new(
+          {
+            '_id' => 'page.matrix',
+            '_type' => 'page.singlequestion',
+            '_uuid' => 'page-uuid',
+            'url' => '/matrix',
+            'heading' => 'Matrix',
+            'components' => [matrix_component]
+          }
+        )
+      end
+      let(:matrix_component) do
+        {
+          '_id' => 'matrix_1',
+          '_type' => 'matrix',
+          '_uuid' => 'matrix-uuid',
+          'legend' => 'Matrix question',
+          'hint' => '',
+          'name' => 'matrix_1',
+          'mode' => matrix_mode,
+          'rows' => [{ 'id' => 'row-1', 'label' => 'Row 1' }],
+          'columns' => [
+            { 'id' => 'column-1', 'label' => 'Yes' },
+            { 'id' => 'column-2', 'label' => 'No' }
+          ],
+          'validation' => { 'required' => true }
+        }
+      end
+
+      context 'when matrix mode is selection' do
+        let(:matrix_mode) { 'selection' }
+        let(:answers) do
+          { 'matrix_1' => { 'row-1' => 'column-2' } }
+        end
+
+        it 'returns normalized selection answers' do
+          expect(page_answers.matrix_1).to eq({ 'row-1' => 'column-2' })
+        end
+      end
+
+      context 'when matrix mode is numeric' do
+        let(:matrix_mode) { 'numeric' }
+        let(:answers) do
+          {
+            'matrix_1' => {
+              'row-1' => {
+                'column-1' => '12.5',
+                'column-2' => ''
+              }
+            }
+          }
+        end
+
+        it 'returns normalized numeric answers with nil for blank cells' do
+          expect(page_answers.matrix_1).to eq(
+            { 'row-1' => { 'column-1' => 12.5, 'column-2' => nil } }
+          )
+        end
+      end
+    end
+
     context 'when sanitizing answers' do
       context 'when the answer should not be sanitised' do
         context 'when component type is text' do

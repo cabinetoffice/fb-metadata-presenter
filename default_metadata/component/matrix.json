@@ -1,0 +1,30 @@
+{
+  "_id": "component.matrix",
+  "_type": "matrix",
+  "errors": {},
+  "legend": "Question",
+  "hint": "",
+  "row_heading": "Row",
+  "name": "component-name",
+  "mode": "selection",
+  "selection_rule": "single_per_row",
+  "rows": [
+    {
+      "id": "row-1",
+      "label": "Row 1"
+    }
+  ],
+  "columns": [
+    {
+      "id": "column-1",
+      "label": "Option 1"
+    },
+    {
+      "id": "column-2",
+      "label": "Option 2"
+    }
+  ],
+  "validation": {
+    "required": true
+  }
+}

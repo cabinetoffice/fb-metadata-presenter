@@ -175,6 +175,14 @@ RSpec.describe MetadataPresenter::Component do
         expect(component.supports_branching?).to be_falsey
       end
     end
+
+    context 'when is matrix' do
+      let(:attributes) { { '_type' => 'matrix' } }
+
+      it 'returns false' do
+        expect(component.supports_branching?).to be_falsey
+      end
+    end
   end
 
   describe '#supported_validations' do
@@ -192,6 +200,23 @@ RSpec.describe MetadataPresenter::Component do
         end
 
         it 'returns the supported validations for number component type' do
+          expect(component.supported_validations).to match_array(expected_validations)
+        end
+      end
+
+      context 'matrix number bundle' do
+        let(:attributes) { { '_type' => 'matrix' } }
+        let(:expected_validations) do
+          %w[
+            exclusive_maximum
+            exclusive_minimum
+            maximum
+            minimum
+            multiple_of
+          ]
+        end
+
+        it 'returns the supported validations for matrix component type' do
           expect(component.supported_validations).to match_array(expected_validations)
         end
       end

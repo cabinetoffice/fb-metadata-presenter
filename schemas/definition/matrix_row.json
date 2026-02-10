@@ -1,0 +1,19 @@
+{
+  "$id": "http://gov.uk/schema/v1.0.0/definition/matrix_row",
+  "_name": "definition.matrix_row",
+  "title": "Matrix row",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "label": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "label"
+  ]
+}

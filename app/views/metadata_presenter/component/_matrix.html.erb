@@ -1,0 +1,100 @@
+<%
+  matrix_answer = @page_answers.send(component.id) || {}
+  rows = Array(component.rows)
+  columns = Array(component.columns)
+  mode = component.mode.presence || 'selection'
+  row_heading = component.row_heading.presence || 'Row'
+  has_errors = f.object.errors[component.id].present?
+%>
+
+<div class="govuk-form-group <%= 'govuk-form-group--error' if has_errors %>">
+  <fieldset class="govuk-fieldset" aria-describedby="<%= "#{component.id}-hint" %>">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+      <%= input_title %>
+    </legend>
+
+    <% if component.hint.present? %>
+      <div id="<%= "#{component.id}-hint" %>" class="govuk-hint" data-fb-default-text="<%= default_text('hint') %>">
+        <%= component.hint %>
+      </div>
+    <% end %>
+
+    <% if has_errors %>
+      <p id="<%= "#{component.id}-error" %>" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> <%= f.object.errors[component.id].first %>
+      </p>
+    <% end %>
+
+    <% if editable? %>
+      <div class="govuk-form-group govuk-!-margin-bottom-4">
+        <label class="govuk-label" for="<%= "#{component.id}-mode" %>">Mode</label>
+        <select id="<%= "#{component.id}-mode" %>" class="govuk-select" data-fb-matrix-mode data-fb-matrix-mode-original="<%= mode %>">
+          <option value="selection" <%= 'selected' if mode == 'selection' %>>Checkboxes</option>
+          <option value="numeric" <%= 'selected' if mode == 'numeric' %>>Numeric input</option>
+        </select>
+      </div>
+    <% end %>
+
+    <table class="govuk-table">
+      <caption class="govuk-visually-hidden"><%= component.legend %></caption>
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row" data-fb-matrix-header-row>
+          <th scope="col" class="govuk-table__header" data-fb-matrix-row-heading><%= row_heading %></th>
+          <% columns.each do |column| %>
+            <th scope="col" class="govuk-table__header" data-fb-matrix-column-label data-fb-matrix-column-id="<%= column['id'] %>">
+              <%= column['label'] %>
+            </th>
+          <% end %>
+        </tr>
+      </thead>
+
+      <tbody class="govuk-table__body" data-fb-matrix-body>
+        <% rows.each do |row| %>
+          <% row_id = row['id'] %>
+          <tr class="govuk-table__row" data-fb-matrix-row-id="<%= row_id %>">
+            <th scope="row" class="govuk-table__header" data-fb-matrix-row-label data-fb-matrix-row-id="<%= row_id %>">
+              <%= row['label'] %>
+            </th>
+
+            <% columns.each do |column| %>
+              <% column_id = column['id'] %>
+              <td class="govuk-table__cell">
+                <% if mode == 'numeric' %>
+                  <% value = matrix_answer.dig(row_id, column_id) %>
+                  <input
+                    class="govuk-input govuk-input--width-5"
+                    type="number"
+                    step="any"
+                    name="answers[<%= component.name %>][<%= row_id %>][<%= column_id %>]"
+                    value="<%= value.nil? ? '' : value %>"
+                    <%= 'disabled' if editable? %>
+                  >
+                <% else %>
+                  <% checked = matrix_answer[row_id].to_s == column_id.to_s %>
+                  <input
+                    type="radio"
+                    name="answers[<%= component.name %>][<%= row_id %>]"
+                    value="<%= column_id %>"
+                    <%= 'checked' if checked %>
+                    <%= 'disabled' if editable? %>
+                  >
+                <% end %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <% if editable? %>
+      <div class="govuk-button-group govuk-!-margin-top-2">
+        <button type="button" class="govuk-button govuk-button--secondary" data-fb-matrix-add-row>
+          Add row
+        </button>
+        <button type="button" class="govuk-button govuk-button--secondary" data-fb-matrix-add-column>
+          Add column
+        </button>
+      </div>
+    <% end %>
+  </fieldset>
+</div>

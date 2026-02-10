@@ -43,5 +43,55 @@ RSpec.describe MetadataPresenter::MaximumValidator do
         expect(validator).to be_valid
       end
     end
+
+    context 'when component is matrix numeric mode' do
+      let(:page) do
+        MetadataPresenter::Page.new(
+          {
+            '_id' => 'page.matrix-max',
+            '_type' => 'page.singlequestion',
+            '_uuid' => 'page-uuid-max',
+            'url' => '/matrix-max',
+            'components' => [
+              {
+                '_id' => 'matrix_max_1',
+                '_type' => 'matrix',
+                '_uuid' => 'matrix-max-uuid',
+                'legend' => 'Matrix numeric question',
+                'hint' => '',
+                'name' => 'matrix_max_1',
+                'mode' => 'numeric',
+                'rows' => [{ 'id' => 'row-1', 'label' => 'Row 1' }],
+                'columns' => [
+                  { 'id' => 'column-1', 'label' => 'A' },
+                  { 'id' => 'column-2', 'label' => 'B' }
+                ],
+                'validation' => { 'maximum' => '5' }
+              }
+            ]
+          }
+        )
+      end
+
+      context 'when any entered cell is above maximum' do
+        let(:answers) do
+          { 'matrix_max_1' => { 'row-1' => { 'column-1' => '5.1', 'column-2' => '' } } }
+        end
+
+        it 'returns invalid' do
+          expect(validator).to_not be_valid
+        end
+      end
+
+      context 'when all entered cells are at or below maximum' do
+        let(:answers) do
+          { 'matrix_max_1' => { 'row-1' => { 'column-1' => '5', 'column-2' => '2.3' } } }
+        end
+
+        it 'returns valid' do
+          expect(validator).to be_valid
+        end
+      end
+    end
   end
 end
