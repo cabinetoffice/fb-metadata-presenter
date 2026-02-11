@@ -107,21 +107,73 @@ module MetadataPresenter
     end
 
     def matrix_selection(value)
+      rows = Array(component.rows)
+      columns = Array(component.columns)
+
+      return matrix_selection_table(value, rows, columns) if render_matrix_selection_table?(rows, columns)
+
       column_labels = Array(component.columns).each_with_object({}) do |column, labels|
         labels[column['id'].to_s] = column['label']
       end
 
-      lines = Array(component.rows).filter_map do |row|
+      lines = rows.filter_map do |row|
         row_id = row['id'].to_s
-        selected_column = value[row_id]
-        next if selected_column.blank?
+        selected_columns = matrix_selection_row_values(value, row_id)
+        next if selected_columns.empty?
 
         row_label = ERB::Util.h(row['label'])
-        selected_label = ERB::Util.h(column_labels[selected_column.to_s] || selected_column)
-        "#{row_label}: #{selected_label}"
+        selected_labels = selected_columns.map do |selected_column|
+          ERB::Util.h(column_labels[selected_column] || selected_column)
+        end.join(', ')
+        "#{row_label}: #{selected_labels}"
       end
 
       lines.join('<br>').html_safe
+    end
+
+    def render_matrix_selection_table?(rows, columns)
+      rows.length > 1 || columns.length > 3
+    end
+
+    def matrix_selection_table(value, rows, columns)
+      row_heading = component.respond_to?(:row_heading) ? component.row_heading : nil
+      first_column_heading = row_heading.presence || ''
+
+      view.content_tag(:table, class: 'govuk-table') do
+        thead = view.content_tag(:thead, class: 'govuk-table__head') do
+          view.content_tag(:tr, class: 'govuk-table__row') do
+            first_header = view.content_tag(:th, first_column_heading, scope: 'col', class: 'govuk-table__header')
+            column_headers = columns.map do |column|
+              view.content_tag(:th, column['label'], scope: 'col', class: 'govuk-table__header')
+            end.join.html_safe
+            first_header + column_headers
+          end
+        end
+
+        tbody = view.content_tag(:tbody, class: 'govuk-table__body') do
+          rows.map do |row|
+            row_id = row['id'].to_s
+            selected_columns = matrix_selection_row_values(value, row_id)
+            view.content_tag(:tr, class: 'govuk-table__row') do
+              row_header = view.content_tag(:th, row['label'], scope: 'row', class: 'govuk-table__header')
+              cells = columns.map do |column|
+                checked = selected_columns.include?(column['id'].to_s)
+                view.content_tag(:td, checked ? '✓' : '', class: 'govuk-table__cell')
+              end.join.html_safe
+              row_header + cells
+            end
+          end.join.html_safe
+        end
+
+        thead + tbody
+      end
+    end
+
+    def matrix_selection_row_values(value, row_id)
+      row_value = value[row_id]
+      return [] if row_value.blank?
+
+      Array(row_value).map(&:to_s).reject(&:blank?)
     end
 
     def matrix_numeric(value)

@@ -174,6 +174,57 @@ RSpec.describe MetadataPresenter::PageAnswersPresenter do
       end
     end
 
+    context 'when component is matrix in selection mode with multiple rows' do
+      let(:page) do
+        MetadataPresenter::Page.new(
+          {
+            '_id' => 'page.matrix.table',
+            '_type' => 'page.singlequestion',
+            '_uuid' => 'page-uuid-table',
+            'url' => '/matrix-table',
+            'components' => [
+              {
+                '_id' => 'matrix_table_1',
+                '_type' => 'matrix',
+                '_uuid' => 'matrix-table-uuid',
+                'legend' => 'Matrix table question',
+                'hint' => '',
+                'name' => 'matrix_table_1',
+                'mode' => 'selection',
+                'rows' => [
+                  { 'id' => 'row-1', 'label' => 'Pre-sifting' },
+                  { 'id' => 'row-2', 'label' => 'Sifting' }
+                ],
+                'columns' => [
+                  { 'id' => 'column-1', 'label' => 'Yes' },
+                  { 'id' => 'column-2', 'label' => 'No' },
+                  { 'id' => 'column-3', 'label' => 'Partial' },
+                  { 'id' => 'column-4', 'label' => 'N/A' }
+                ],
+                'validation' => { 'required' => true }
+              }
+            ]
+          }
+        )
+      end
+      let(:component) { page.components.first }
+      let(:answers) do
+        {
+          component.id => {
+            'row-1' => 'column-1',
+            'row-2' => 'column-4'
+          }
+        }
+      end
+
+      it 'returns a table rendering for matrix selection answers' do
+        expect(presenter.answer).to include('<table')
+        expect(presenter.answer).to include('Pre-sifting')
+        expect(presenter.answer).to include('Sifting')
+        expect(presenter.answer).to include('✓')
+      end
+    end
+
     context 'when component is matrix in numeric mode' do
       let(:page) do
         MetadataPresenter::Page.new(
