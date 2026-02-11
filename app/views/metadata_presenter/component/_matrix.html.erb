@@ -96,6 +96,7 @@
                   <% checked = matrix_answer[row_id].to_s == column_id.to_s %>
                   <input
                     type="checkbox"
+                    class="fb-matrix-checkbox"
                     name="answers[<%= component.name %>][<%= row_id %>]"
                     value="<%= column_id %>"
                     data-fb-matrix-selection-row-id="<%= row_id %>"
