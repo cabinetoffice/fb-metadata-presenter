@@ -39,10 +39,23 @@
       <caption class="govuk-visually-hidden"><%= component.legend %></caption>
       <thead class="govuk-table__head">
         <tr class="govuk-table__row" data-fb-matrix-header-row>
-          <th scope="col" class="govuk-table__header" data-fb-matrix-row-heading><%= row_heading %></th>
+          <th scope="col" class="govuk-table__header">
+            <span data-fb-matrix-row-heading><%= row_heading %></span>
+          </th>
           <% columns.each do |column| %>
-            <th scope="col" class="govuk-table__header" data-fb-matrix-column-label data-fb-matrix-column-id="<%= column['id'] %>">
-              <%= column['label'] %>
+            <% column_id = column['id'] %>
+            <th scope="col" class="govuk-table__header" data-fb-matrix-column-id="<%= column_id %>">
+              <span data-fb-matrix-column-label data-fb-matrix-column-id="<%= column_id %>"><%= column['label'] %></span>
+              <% if editable? %>
+                <button
+                  type="button"
+                  class="govuk-link govuk-!-margin-left-1 govuk-!-font-size-16"
+                  data-fb-matrix-remove-column
+                  data-fb-matrix-column-id="<%= column_id %>"
+                >
+                  Delete
+                </button>
+              <% end %>
             </th>
           <% end %>
         </tr>
@@ -52,13 +65,23 @@
         <% rows.each do |row| %>
           <% row_id = row['id'] %>
           <tr class="govuk-table__row" data-fb-matrix-row-id="<%= row_id %>">
-            <th scope="row" class="govuk-table__header" data-fb-matrix-row-label data-fb-matrix-row-id="<%= row_id %>">
-              <%= row['label'] %>
+            <th scope="row" class="govuk-table__header">
+              <span data-fb-matrix-row-label data-fb-matrix-row-id="<%= row_id %>"><%= row['label'] %></span>
+              <% if editable? %>
+                <button
+                  type="button"
+                  class="govuk-link govuk-!-margin-left-1 govuk-!-font-size-16"
+                  data-fb-matrix-remove-row
+                  data-fb-matrix-row-id="<%= row_id %>"
+                >
+                  Delete
+                </button>
+              <% end %>
             </th>
 
             <% columns.each do |column| %>
               <% column_id = column['id'] %>
-              <td class="govuk-table__cell">
+              <td class="govuk-table__cell" data-fb-matrix-column-id="<%= column_id %>">
                 <% if mode == 'numeric' %>
                   <% value = matrix_answer.dig(row_id, column_id) %>
                   <input
@@ -72,9 +95,10 @@
                 <% else %>
                   <% checked = matrix_answer[row_id].to_s == column_id.to_s %>
                   <input
-                    type="radio"
+                    type="checkbox"
                     name="answers[<%= component.name %>][<%= row_id %>]"
                     value="<%= column_id %>"
+                    data-fb-matrix-selection-row-id="<%= row_id %>"
                     <%= 'checked' if checked %>
                     <%= 'disabled' if editable? %>
                   >

@@ -158,7 +158,7 @@ module MetadataPresenter
         rows.each_with_object({}) do |row, normalized|
           row_id = row['id'].to_s
           value = raw_answer[row_id]
-          normalized[row_id] = value.blank? ? nil : sanitize(value)
+          normalized[row_id] = normalized_matrix_selection_value(value)
         end
       end
     end
@@ -220,6 +220,13 @@ module MetadataPresenter
       return parsed unless parsed.nil?
 
       sanitize(value)
+    end
+
+    def normalized_matrix_selection_value(value)
+      selected_value = value.is_a?(Array) ? value.reject(&:blank?).last : value
+      return nil if selected_value.blank?
+
+      sanitize(selected_value)
     end
 
     # NOTE: Address component is different to other components in the sense it can
