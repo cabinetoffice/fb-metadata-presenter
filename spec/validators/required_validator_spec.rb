@@ -222,6 +222,93 @@ RSpec.describe MetadataPresenter::RequiredValidator do
         end
       end
 
+      context 'when component is a tally' do
+        let(:page) do
+          MetadataPresenter::Page.new(
+            {
+              '_id' => 'page.tally',
+              '_type' => 'page.singlequestion',
+              '_uuid' => 'page-uuid-tally',
+              'url' => '/tally',
+              'components' => [
+                {
+                  '_id' => 'tally_1',
+                  '_type' => 'tally',
+                  '_uuid' => 'tally-uuid',
+                  'legend' => 'Tally question',
+                  'hint' => '',
+                  'name' => 'tally_1',
+                  'rows' => [{ 'id' => 'row-1', 'label' => 'Row 1', 'active_column_ids' => ['column-1'] }],
+                  'columns' => [
+                    { 'id' => 'column-1', 'label' => '1' },
+                    { 'id' => 'column-2', 'label' => '2' }
+                  ],
+                  'validation' => { 'required' => true }
+                }
+              ]
+            }
+          )
+        end
+
+        context 'when active cells are blank' do
+          let(:answers) do
+            { 'tally_1' => { 'row-1' => { 'column-1' => '', 'column-2' => '' } } }
+          end
+
+          it 'returns invalid' do
+            expect(validator).to_not be_valid
+          end
+        end
+
+        context 'when active cells include a value' do
+          let(:answers) do
+            { 'tally_1' => { 'row-1' => { 'column-1' => '4', 'column-2' => '' } } }
+          end
+
+          it 'returns valid' do
+            expect(validator).to be_valid
+          end
+        end
+
+        context 'when all active cells are explicitly overridden as disabled' do
+          let(:page) do
+            MetadataPresenter::Page.new(
+              {
+                '_id' => 'page.tally',
+                '_type' => 'page.singlequestion',
+                '_uuid' => 'page-uuid-tally',
+                'url' => '/tally',
+                'components' => [
+                  {
+                    '_id' => 'tally_1',
+                    '_type' => 'tally',
+                    '_uuid' => 'tally-uuid',
+                    'legend' => 'Tally question',
+                    'hint' => '',
+                    'name' => 'tally_1',
+                    'rows' => [{ 'id' => 'row-1', 'label' => 'Row 1', 'active_column_ids' => ['column-1'] }],
+                    'columns' => [
+                      { 'id' => 'column-1', 'label' => '1' }
+                    ],
+                    'cell_overrides' => {
+                      'row-1:column-1' => { 'disabled' => true }
+                    },
+                    'validation' => { 'required' => true }
+                  }
+                ]
+              }
+            )
+          end
+          let(:answers) do
+            { 'tally_1' => { 'row-1' => { 'column-1' => '' } } }
+          end
+
+          it 'returns valid because disabled cells are excluded from required validation' do
+            expect(validator).to be_valid
+          end
+        end
+      end
+
       context 'when date field' do
         let(:page) { service.find_page_by_url('/holiday') }
         let(:answers) do

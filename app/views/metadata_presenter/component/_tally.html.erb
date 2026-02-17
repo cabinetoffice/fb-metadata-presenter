@@ -1,0 +1,173 @@
+<%
+  tally_answer = @page_answers.send(component.id) || {}
+  rows = Array(component.rows)
+  columns = Array(component.columns)
+  row_heading = component.row_heading.presence || 'Row'
+  totals = component.totals || {}
+  show_row_totals = totals['row'] != false
+  show_grand_total = totals['grand'] != false
+  has_errors = f.object.errors[component.id].present?
+
+  active_column_ids_for = lambda do |row|
+    configured = Array(row['active_column_ids']).map(&:to_s)
+    configured = columns.map { |column| column['id'].to_s } if configured.empty?
+    configured
+  end
+%>
+
+<div class="govuk-form-group <%= 'govuk-form-group--error' if has_errors %>" data-fb-tally-table>
+  <fieldset class="govuk-fieldset" aria-describedby="<%= "#{component.id}-hint" %>">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+      <%= input_title %>
+    </legend>
+
+    <% if component.hint.present? %>
+      <div id="<%= "#{component.id}-hint" %>" class="govuk-hint" data-fb-default-text="<%= default_text('hint') %>">
+        <%= component.hint %>
+      </div>
+    <% end %>
+
+    <% if has_errors %>
+      <p id="<%= "#{component.id}-error" %>" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> <%= f.object.errors[component.id].first %>
+      </p>
+    <% end %>
+
+    <% if editable? %>
+      <div class="govuk-hint govuk-!-margin-bottom-3" data-fb-tally-availability-hint hidden>
+        Configuration mode is on. Click cells to mark unavailable. Click again to re-enable.
+      </div>
+    <% end %>
+
+    <table class="govuk-table">
+      <caption class="govuk-visually-hidden"><%= component.legend %></caption>
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row" data-fb-matrix-header-row>
+          <th scope="col" class="govuk-table__header">
+            <span data-fb-matrix-row-heading><%= row_heading %></span>
+          </th>
+          <% columns.each do |column| %>
+            <% column_id = column['id'].to_s %>
+            <th scope="col" class="govuk-table__header" data-fb-matrix-column-id="<%= column_id %>">
+              <span data-fb-matrix-column-label data-fb-matrix-column-id="<%= column_id %>"><%= column['label'] %></span>
+              <% if editable? %>
+                <button
+                  type="button"
+                  class="govuk-link govuk-!-margin-left-1 govuk-!-font-size-16"
+                  data-fb-matrix-remove-column
+                  data-fb-matrix-column-id="<%= column_id %>"
+                >
+                  Delete
+                </button>
+              <% end %>
+            </th>
+          <% end %>
+          <% if show_row_totals %>
+            <th scope="col" class="govuk-table__header" data-fb-tally-total-header>Total</th>
+          <% end %>
+        </tr>
+      </thead>
+
+      <tbody class="govuk-table__body" data-fb-matrix-body>
+        <% rows.each do |row| %>
+          <% row_id = row['id'].to_s %>
+          <% active_column_ids = active_column_ids_for.call(row) %>
+
+          <tr class="govuk-table__row" data-fb-matrix-row-id="<%= row_id %>">
+            <th scope="row" class="govuk-table__header">
+              <span data-fb-matrix-row-label data-fb-matrix-row-id="<%= row_id %>"><%= row['label'] %></span>
+              <% if editable? %>
+                <button
+                  type="button"
+                  class="govuk-link govuk-!-margin-left-1 govuk-!-font-size-16"
+                  data-fb-matrix-remove-row
+                  data-fb-matrix-row-id="<%= row_id %>"
+                >
+                  Delete
+                </button>
+              <% end %>
+            </th>
+
+            <% columns.each do |column| %>
+              <% column_id = column['id'].to_s %>
+              <% value = tally_answer.dig('cells', row_id, column_id) %>
+              <% override = (component.cell_overrides || {})["#{row_id}:#{column_id}"] || {} %>
+              <% override_disabled = override == true || override['disabled'] == true %>
+              <% active = editable? ? !override_disabled : (active_column_ids.include?(column_id) && !override_disabled) %>
+              <% disabled_by_config = !active %>
+
+              <td class="govuk-table__cell" data-fb-matrix-column-id="<%= column_id %>" data-fb-tally-cell-disabled="<%= disabled_by_config %>">
+                <input
+                  class="govuk-input govuk-input--width-5"
+                  type="number"
+                  step="1"
+                  name="answers[<%= component.name %>][<%= row_id %>][<%= column_id %>]"
+                  value="<%= value.nil? ? '' : value %>"
+                  data-fb-tally-row-id="<%= row_id %>"
+                  data-fb-tally-column-id="<%= column_id %>"
+                  data-fb-tally-disabled-by-config="<%= disabled_by_config %>"
+                  <%= 'disabled' unless active %>
+                  <%= 'readonly' if editable? %>
+                >
+              </td>
+            <% end %>
+
+            <% if show_row_totals %>
+              <% row_total = tally_answer.dig('row_totals', row_id) %>
+              <td class="govuk-table__cell" data-fb-tally-row-total-cell>
+                <input
+                  class="govuk-input govuk-input--width-5"
+                  type="text"
+                  value="<%= row_total.nil? ? '' : row_total %>"
+                  readonly
+                  disabled
+                  aria-label="Total for <%= row['label'] %>"
+                  data-fb-tally-total-input
+                  data-fb-tally-row-total="<%= row_id %>"
+                >
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <% if show_grand_total %>
+      <% grand_total = tally_answer['grand_total'] %>
+      <div class="govuk-form-group govuk-!-margin-top-6">
+        <label class="govuk-label govuk-label--m" for="<%= "#{component.id}-grand-total" %>">Total</label>
+        <input
+          id="<%= "#{component.id}-grand-total" %>"
+          class="govuk-input govuk-input--width-10"
+          type="text"
+          value="<%= grand_total.nil? ? '' : grand_total %>"
+          readonly
+          disabled
+          data-fb-tally-total-input
+          data-fb-tally-grand-total
+        >
+      </div>
+    <% end %>
+
+    <% if editable? %>
+      <div class="govuk-button-group govuk-!-margin-top-2">
+        <button type="button" class="govuk-button govuk-button--secondary" data-fb-matrix-add-row>
+          Add row
+        </button>
+        <button type="button" class="govuk-button govuk-button--secondary" data-fb-matrix-add-column>
+          Add column
+        </button>
+        <button
+          type="button"
+          class="govuk-button govuk-button--secondary"
+          data-fb-tally-toggle-availability
+          data-fb-tally-toggle-label-off="Configure unavailable cells"
+          data-fb-tally-toggle-label-on="Done configuring unavailable cells"
+          aria-pressed="false"
+        >
+          Configure unavailable cells
+        </button>
+      </div>
+    <% end %>
+  </fieldset>
+</div>

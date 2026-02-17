@@ -1,0 +1,76 @@
+{
+  "$id": "http://gov.uk/schema/v1.0.0/tally",
+  "_name": "component.tally",
+  "title": "Tally",
+  "description": "Let users enter numeric values in a table and calculate totals",
+  "type": "object",
+  "properties": {
+    "_type": {
+      "const": "tally"
+    },
+    "mode": {
+      "const": "numeric"
+    },
+    "row_heading": {
+      "type": "string"
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "definition.tally_row"
+      }
+    },
+    "columns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "definition.matrix_column"
+      }
+    },
+    "totals": {
+      "type": "object",
+      "properties": {
+        "row": {
+          "type": "boolean"
+        },
+        "grand": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "cell_overrides": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "disabled": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "definition.fieldset"
+    },
+    {
+      "$ref": "definition.name"
+    },
+    {
+      "$ref": "validations#/definitions/required_bundle"
+    },
+    {
+      "$ref": "validations#/definitions/number_bundle"
+    }
+  ],
+  "required": [
+    "name",
+    "mode",
+    "rows",
+    "columns"
+  ]
+}

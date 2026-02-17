@@ -5,6 +5,7 @@ class MetadataPresenter::Component < MetadataPresenter::Metadata
     'date' => 'date',
     'number' => 'number',
     'matrix' => 'number',
+    'tally' => 'number',
     'text' => 'string',
     'textarea' => 'string',
     'multiupload' => 'file'
@@ -74,6 +75,10 @@ class MetadataPresenter::Component < MetadataPresenter::Metadata
 
   def matrix?
     type == 'matrix'
+  end
+
+  def tally?
+    type == 'tally'
   end
 
   def find_item_by_uuid(uuid)

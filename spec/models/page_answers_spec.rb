@@ -298,6 +298,67 @@ RSpec.describe MetadataPresenter::PageAnswers do
       end
     end
 
+    context 'when the component is a tally' do
+      let(:page) do
+        MetadataPresenter::Page.new(
+          {
+            '_id' => 'page.tally',
+            '_type' => 'page.singlequestion',
+            '_uuid' => 'page-tally-uuid',
+            'url' => '/tally',
+            'heading' => 'Tally',
+            'components' => [tally_component]
+          }
+        )
+      end
+      let(:tally_component) do
+        {
+          '_id' => 'tally_1',
+          '_type' => 'tally',
+          '_uuid' => 'tally-uuid',
+          'legend' => 'Tally question',
+          'hint' => '',
+          'name' => 'tally_1',
+          'rows' => [{ 'id' => 'row-1', 'label' => 'Row 1', 'active_column_ids' => ['column-1', 'column-2'] }],
+          'columns' => [
+            { 'id' => 'column-1', 'label' => '1' },
+            { 'id' => 'column-2', 'label' => '2' }
+          ],
+          'cell_overrides' => {
+            'row-1:column-2' => { 'disabled' => true }
+          },
+          'validation' => { 'required' => true }
+        }
+      end
+      let(:answers) do
+        {
+          'tally_1' => {
+            'row-1' => {
+              'column-1' => '12',
+              'column-2' => '99'
+            }
+          }
+        }
+      end
+
+      it 'normalizes only active cells and computes totals' do
+        expect(page_answers.tally_1).to eq(
+          {
+            'cells' => {
+              'row-1' => {
+                'column-1' => 12.0,
+                'column-2' => nil
+              }
+            },
+            'row_totals' => {
+              'row-1' => 12.0
+            },
+            'grand_total' => 12.0
+          }
+        )
+      end
+    end
+
     context 'when sanitizing answers' do
       context 'when the answer should not be sanitised' do
         context 'when component type is text' do

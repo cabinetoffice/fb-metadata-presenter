@@ -209,5 +209,55 @@ module MetadataPresenter
         thead + tbody
       end
     end
+
+    def tally(value)
+      columns = Array(component.columns)
+      rows = Array(component.rows)
+      cells = value['cells'] || {}
+      row_totals = value['row_totals'] || {}
+      grand_total = value['grand_total']
+
+      view.content_tag(:table, class: 'govuk-table') do
+        thead = view.content_tag(:thead, class: 'govuk-table__head') do
+          view.content_tag(:tr, class: 'govuk-table__row') do
+            first_header = view.content_tag(:th, component.row_heading.presence || '', scope: 'col', class: 'govuk-table__header')
+            column_headers = columns.map do |column|
+              view.content_tag(:th, column['label'], scope: 'col', class: 'govuk-table__header')
+            end.join.html_safe
+            total_header = view.content_tag(:th, 'Total', scope: 'col', class: 'govuk-table__header')
+            first_header + column_headers + total_header
+          end
+        end
+
+        tbody = view.content_tag(:tbody, class: 'govuk-table__body') do
+          rows.map do |row|
+            row_id = row['id'].to_s
+            row_cells = cells[row_id] || {}
+
+            view.content_tag(:tr, class: 'govuk-table__row') do
+              row_header = view.content_tag(:th, row['label'], scope: 'row', class: 'govuk-table__header')
+              value_cells = columns.map do |column|
+                column_id = column['id'].to_s
+                cell_value = row_cells[column_id]
+                view.content_tag(:td, cell_value.nil? ? '' : cell_value, class: 'govuk-table__cell')
+              end.join.html_safe
+              total_cell = view.content_tag(:td, row_totals[row_id], class: 'govuk-table__cell')
+              row_header + value_cells + total_cell
+            end
+          end.join.html_safe
+        end
+
+        tfoot = view.content_tag(:tfoot, class: 'govuk-table__foot') do
+          view.content_tag(:tr, class: 'govuk-table__row') do
+            label_cell = view.content_tag(:th, 'Total', scope: 'row', class: 'govuk-table__header')
+            spacer = columns.map { view.content_tag(:td, '', class: 'govuk-table__cell') }.join.html_safe
+            total = view.content_tag(:td, grand_total, class: 'govuk-table__cell')
+            label_cell + spacer + total
+          end
+        end
+
+        thead + tbody + tfoot
+      end
+    end
   end
 end

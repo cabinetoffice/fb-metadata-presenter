@@ -221,6 +221,23 @@ RSpec.describe MetadataPresenter::Component do
         end
       end
 
+      context 'tally number bundle' do
+        let(:attributes) { { '_type' => 'tally' } }
+        let(:expected_validations) do
+          %w[
+            exclusive_maximum
+            exclusive_minimum
+            maximum
+            minimum
+            multiple_of
+          ]
+        end
+
+        it 'returns the supported validations for tally component type' do
+          expect(component.supported_validations).to match_array(expected_validations)
+        end
+      end
+
       context 'string bundle' do
         let(:expected_validations) do
           %w[

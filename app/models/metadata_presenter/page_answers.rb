@@ -36,6 +36,8 @@ module MetadataPresenter
         answers[method_name.to_s].to_a
       elsif component && component.type == 'matrix'
         matrix_answer(component)
+      elsif component && component.type == 'tally'
+        tally_answer(component)
       elsif component && component.type == 'address'
         address_answer(method_name.to_s)
       else
@@ -163,6 +165,36 @@ module MetadataPresenter
       end
     end
 
+    def tally_answer(component)
+      raw_answer = hash_value(answers[component.id.to_s])
+      rows = Array(component.rows)
+      columns = Array(component.columns)
+
+      cells = rows.each_with_object({}) do |row, normalized|
+        row_id = row['id'].to_s
+        row_answer = hash_value(raw_answer[row_id])
+
+        normalized[row_id] = columns.each_with_object({}) do |column, row_normalized|
+          column_id = column['id'].to_s
+          row_normalized[column_id] = if tally_cell_enabled?(component, row, column, columns)
+                                        numeric_matrix_value(row_answer[column_id])
+                                      else
+                                        nil
+                                      end
+        end
+      end
+
+      row_totals = cells.each_with_object({}) do |(row_id, row_cells), totals|
+        totals[row_id] = row_cells.values.select { |value| value.is_a?(Numeric) }.sum
+      end
+
+      {
+        'cells' => cells,
+        'row_totals' => row_totals,
+        'grand_total' => row_totals.values.compact.sum
+      }
+    end
+
     def raw_date_answer(component_id)
       [
         GOVUKDesignSystemFormBuilder::Elements::Date::SEGMENTS[:day],
@@ -227,6 +259,30 @@ module MetadataPresenter
       return nil if selected_value.blank?
 
       sanitize(selected_value)
+    end
+
+    def tally_active_column_ids(row, columns)
+      configured = Array(row['active_column_ids']).map(&:to_s)
+      return configured unless configured.empty?
+
+      columns.map { |column| column['id'].to_s }
+    end
+
+    def tally_cell_enabled?(component, row, column, columns)
+      row_id = row['id'].to_s
+      column_id = column['id'].to_s
+      active_column_ids = tally_active_column_ids(row, columns)
+      return false unless active_column_ids.include?(column_id)
+
+      !tally_cell_overridden_disabled?(component, row_id, column_id)
+    end
+
+    def tally_cell_overridden_disabled?(component, row_id, column_id)
+      override = hash_value(component.cell_overrides)["#{row_id}:#{column_id}"]
+      return true if override == true
+      return false unless override.is_a?(Hash)
+
+      override['disabled'] == true
     end
 
     # NOTE: Address component is different to other components in the sense it can

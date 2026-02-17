@@ -265,6 +265,56 @@ RSpec.describe MetadataPresenter::PageAnswersPresenter do
       end
     end
 
+    context 'when component is tally' do
+      let(:page) do
+        MetadataPresenter::Page.new(
+          {
+            '_id' => 'page.tally',
+            '_type' => 'page.singlequestion',
+            '_uuid' => 'page-uuid-tally',
+            'url' => '/tally',
+            'components' => [
+              {
+                '_id' => 'tally_1',
+                '_type' => 'tally',
+                '_uuid' => 'tally-uuid',
+                'legend' => 'Tally question',
+                'hint' => '',
+                'name' => 'tally_1',
+                'row_heading' => 'Grade',
+                'rows' => [
+                  { 'id' => 'row-1', 'label' => 'SCS 2', 'active_column_ids' => ['column-1', 'column-2'] }
+                ],
+                'columns' => [
+                  { 'id' => 'column-1', 'label' => '1' },
+                  { 'id' => 'column-2', 'label' => '2' }
+                ],
+                'validation' => { 'required' => true }
+              }
+            ]
+          }
+        )
+      end
+      let(:component) { page.components.first }
+      let(:answers) do
+        {
+          component.id => {
+            'row-1' => {
+              'column-1' => '10',
+              'column-2' => '3'
+            }
+          }
+        }
+      end
+
+      it 'returns a table with row and grand totals' do
+        expect(presenter.answer).to include('<table')
+        expect(presenter.answer).to include('SCS 2')
+        expect(presenter.answer).to include('13.0')
+        expect(presenter.answer).to include('Total')
+      end
+    end
+
     context 'when there is no answer' do
       let(:page) { service.find_page_by_url('/name') }
       let(:answers) { {} }
