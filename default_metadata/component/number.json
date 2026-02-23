@@ -9,5 +9,10 @@
   "validation": {
     "required": true,
     "number": true
+  },
+  "calculation": {
+    "enabled": false,
+    "expression": "",
+    "dependencies": []
   }
 }

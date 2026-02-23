@@ -116,7 +116,7 @@ module MetadataPresenter
     end
 
     def render_validation_error
-      @user_data = answers_params
+      @user_data = incoming_answer.is_a?(Hash) ? incoming_answer : answers_params
       load_autocomplete_items
       load_page_content
 
@@ -130,7 +130,10 @@ module MetadataPresenter
         multiupload_answer.previous_answers = @previous_answers[Array(page.components).first.id]
         multiupload_answer.incoming_answer = answers_params
       end
-      multiupload_answer || answers_params
+
+      return multiupload_answer if multiupload_answer.present?
+
+      apply_calculations(answers_params.to_h)
     end
 
     def answers_params
@@ -208,6 +211,17 @@ module MetadataPresenter
           adapter: upload_adapter
         ).upload
       end
+    end
+
+    def apply_calculations(current_answers)
+      source_answers = @previous_answers.deep_dup.merge(current_answers)
+      calculated = EvaluateCalculations.new(page:, answers: source_answers, service:).call
+
+      calculated_values = Array(page.components).select(&:calculated?).each_with_object({}) do |component, hash|
+        hash[component.id] = calculated[component.id] if calculated.key?(component.id)
+      end
+
+      current_answers.merge(calculated_values)
     end
 
     def upload_adapter

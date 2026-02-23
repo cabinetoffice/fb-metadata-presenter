@@ -107,6 +107,26 @@ class MetadataPresenter::Component < MetadataPresenter::Metadata
     end
   end
 
+  def calculation
+    metadata.calculation.is_a?(Hash) ? metadata.calculation : {}
+  end
+
+  def calculation_enabled?
+    calculation['enabled'] == true
+  end
+
+  def calculated?
+    type == 'number' && calculation_enabled?
+  end
+
+  def calculation_expression
+    calculation['expression']
+  end
+
+  def calculation_dependencies
+    Array(calculation['dependencies'])
+  end
+
   private
 
   def validation_bundle_key

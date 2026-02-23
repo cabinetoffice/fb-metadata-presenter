@@ -13,6 +13,46 @@
     },
     "width_class_input": {
       "default": "10"
+    },
+    "calculation": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "expression": {
+          "type": "string"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "page_uuid": {
+                "type": "string"
+              },
+              "component_uuid": {
+                "type": "string"
+              },
+              "path": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "component_uuid"
+            ]
+          }
+        }
+      }
     }
   },
   "allOf": [

@@ -10,6 +10,7 @@ module MetadataPresenter
         load_autocomplete_items
         load_page_content
 
+        @user_data = EvaluateCalculations.new(page: @page, answers: @user_data, service:).call
         @page_answers = PageAnswers.new(@page, @user_data)
         render template: @page.template
       else
